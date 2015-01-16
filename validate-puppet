@@ -28,8 +28,8 @@ help(){
   echo "                  directory (./)"
   echo ""
   echo "Exit status is the number of corrupted files"
-  echo "if this number is below 254."
-  echo "254 is used for other errors"
+  echo "if this number is below 254. 254 is used for"
+  echo "other errors."
   exit 254
 }
 
