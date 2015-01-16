@@ -24,16 +24,16 @@ if this number is below 254.
 Execute in current directory:
 ```bash
 modules/my_module1 » validate-puppet
-Syntax of [./manifests/init.pp]                                                            OK
-Syntax of [./tests/init.pp]                                                                OK
-Syntax check failed for [./templates/tmpl.conf.erb]                                        KO
+Syntax of [./manifests/init.pp]                                                   OK
+Syntax of [./tests/init.pp]                                                       OK
+Syntax check failed for [./templates/tmpl.conf.erb]                               KO
 ```
 
 Execute in another directory:
 ```bash
 modules/my_module1 » validate-puppet -d ../my_other_module
-Syntax of [../my_other_module/manifests/init.pp]                                           OK
-Syntax of [../my_other_module/tests/init.pp]                                               OK
+Syntax of [../my_other_module/manifests/init.pp]                                  OK
+Syntax of [../my_other_module/tests/init.pp]                                      OK
 ```
 
 Quiet output (with 2 files in error):
