@@ -38,7 +38,7 @@ Syntax of [../my_other_module/tests/init.pp]                                    
 
 Quiet output (with 2 files in error):
 ```bash
-modules/my_module1 » validate-puppet -d ../my_last_module
+modules/my_module1 » validate-puppet -s -d ../my_last_module
 modules/my_module1 » echo $?
 2
 ```
