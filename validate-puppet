@@ -1,0 +1,160 @@
+#!/bin/sh
+
+# Released under MIT License
+
+RCol='\33[0m'    # Text Reset
+
+# Regular            Bold                 Underline            High Intensity       BoldHigh Intens   
+Bla='\33[0;30m';     BBla='\33[1;30m';    UBla='\33[4;30m';    IBla='\33[0;90m';    BIBla='\33[1;90m';
+Red='\33[0;31m';     BRed='\33[1;31m';    URed='\33[4;31m';    IRed='\33[0;91m';    BIRed='\33[1;91m';
+Gre='\33[0;32m';     BGre='\33[1;32m';    UGre='\33[4;32m';    IGre='\33[0;92m';    BIGre='\33[1;92m';
+Yel='\33[0;33m';     BYel='\33[1;33m';    UYel='\33[4;33m';    IYel='\33[0;93m';    BIYel='\33[1;93m';
+Blu='\33[0;34m';     BBlu='\33[1;34m';    UBlu='\33[4;34m';    IBlu='\33[0;94m';    BIBlu='\33[1;94m';
+Pur='\33[0;35m';     BPur='\33[1;35m';    UPur='\33[4;35m';    IPur='\33[0;95m';    BIPur='\33[1;95m';
+Cya='\33[0;36m';     BCya='\33[1;36m';    UCya='\33[4;36m';    ICya='\33[0;96m';    BICya='\33[1;96m';
+Whi='\33[0;37m';     BWhi='\33[1;37m';    UWhi='\33[4;37m';    IWhi='\33[0;97m';    BIWhi='\33[1;97m';
+
+DIR=./
+
+help(){
+  echo "usage: `basename $0` [-h] [-d <directory>]"
+  echo ""
+  echo "simple syntax checker for puppet and erb files"
+  echo "arguments:"
+  echo "  -h:             displays this help"
+  echo "  -s:             silent"
+  echo "  -d <directory>: checks .erb and .pp file of <directory>"
+  echo "                  if not specified, checks from current"
+  echo "                  directory (./)"
+  echo ""
+  echo "Exit status is the number of corrupted files"
+  echo "if this number is below 254."
+  echo "254 is used for other errors"
+  exit 254
+}
+
+while getopts ":hd:s" opt; do
+  case $opt in
+
+    h) 
+        help
+        ;;
+    d)
+        DIR="$OPTARG"
+        ;;
+    s)
+        SILENT="yes"
+        ;;
+
+    \?)
+        echo "Invalid option: -$OPTARG" >&2
+        help
+        exit 1
+        ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+        help
+        exit 1
+        ;;
+  esac
+done
+
+clean(){
+    rm  "${ERROR_COUNTER}"
+}
+
+trap clean HUP INT TERM
+
+
+ok_message(){
+    file="$1"
+    width=$((80 - `echo ${file}|wc -c`))
+    if ! [ "${SILENT}" = "yes" ]
+    then
+        printf "${Gre}Syntax of ${Blu}[${BYel}${file}${Blu}]${Gre}%${width}sOK${RCol}\n" ' '
+    fi
+}
+
+ko_message(){
+    file="$1"
+    width=$((66 - `echo ${file}|wc -c`))
+    if ! [ "${SILENT}" = "yes" ]
+    then
+        printf "${Red}Syntax check failed for ${Blu}[${BPur}${file}${Blu}]${Red}%${width}sKO${RCol}\n" ' '
+    fi
+}
+
+validate_pp(){
+    file="$1"
+    if ! [ "${SILENT}" = "yes" ]
+    then
+        puppet parser validate "$file"
+    else
+        puppet parser validate "$file" >/dev/null 2>&1
+    fi
+    ret=$?
+    if [ $ret -eq 0 ]
+    then
+        ok_message "$file"
+    else
+        ko_message "$file"
+    fi
+    return $ret
+}
+
+validate_erb(){
+    file="$1"
+    erb -x -T '-' "$file" | ruby -c 1>/dev/null 2>&1
+    ret=$?
+    if [ $ret -eq 0 ]
+    then
+        ok_message "$file"
+    else
+        ko_message "$file"
+    fi
+    return $ret
+}
+
+incr_counter(){
+    val=`cat ${ERROR_COUNTER}`
+    if [ $val -lt 253 ]
+    then
+        val=$(( $val + 1 ))
+        echo $val >${ERROR_COUNTER}
+    fi
+}
+
+tmpfile_error(){
+    if ! [ "${SILENT}" = "yes" ]
+    then
+        printf "${Red}Impossible to create tmp file${RCol}\n"
+    fi
+    clean 
+    exit 254
+}
+
+if ! [ -d "$DIR" ]
+then
+    printf "Directory $DIR doesn't exist\n"
+    help
+fi
+
+ERROR_COUNTER=`mktemp`
+[ $? -eq 0 ] || tmpfile_error 
+echo 0 >${ERROR_COUNTER}
+
+find "$DIR" -type f -name "*.pp" |while read file 
+do
+    validate_pp "$file" || incr_counter
+
+done 
+
+find "$DIR" -type f -name "*.erb" |while read file 
+do
+    validate_erb "$file" || incr_counter
+done
+
+
+ret=`cat ${ERROR_COUNTER}`
+clean
+exit $ret
