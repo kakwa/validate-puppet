@@ -46,3 +46,15 @@ modules/my_module1 » echo $?
 ## Dependancies ##
 
 This script needs puppet to be installed.
+
+## Installation ##
+
+As root:
+
+```bash
+rm -f /usr/local/bin/validate-puppet
+curl https://raw.githubusercontent.com/kakwa/validate-puppet/master/validate-puppet \
+-o /usr/local/bin/validate-puppet
+chmod 755 /usr/local/bin/validate-puppet
+#end
+```
