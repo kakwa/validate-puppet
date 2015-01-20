@@ -88,18 +88,17 @@ ko_message(){
 
 validate_pp(){
     file="$1"
-    if ! [ "${SILENT}" = "yes" ]
-    then
-        puppet parser validate "$file"
-    else
-        puppet parser validate "$file" >/dev/null 2>&1
-    fi
+    puppet parser validate "$file" >/dev/null 2>&1
     ret=$?
     if [ $ret -eq 0 ]
     then
         ok_message "$file"
     else
         ko_message "$file"
+    fi
+    if ! [ "${SILENT}" = "yes" ] && [ $ret -ne 0 ]
+    then
+        puppet parser validate "$file"
     fi
     return $ret
 }
@@ -113,6 +112,12 @@ validate_erb(){
         ok_message "$file"
     else
         ko_message "$file"
+    fi
+    if ! [ "${SILENT}" = "yes" ] && [ $ret -ne 0 ]
+    then
+	printf "${BPur}"
+    	erb -x -T '-' "$file" | ruby -c 
+	printf "${RCol}"
     fi
     return $ret
 }
