@@ -16,6 +16,8 @@ Whi='\33[0;37m';     BWhi='\33[1;37m';    UWhi='\33[4;37m';    IWhi='\33[0;97m';
 
 DIR=./
 
+TERM_WIDTH=`tput cols`
+
 help(){
   echo "usage: `basename $0` [-h] [-d <directory>]"
   echo ""
@@ -68,7 +70,7 @@ trap clean HUP INT TERM
 
 ok_message(){
     file="$1"
-    width=$((80 - `echo ${file}|wc -c`))
+    width=$(($TERM_WIDTH - 14 - `echo ${file}|wc -c`))
     if ! [ "${SILENT}" = "yes" ]
     then
         printf "${Gre}Syntax of ${Blu}[${BYel}${file}${Blu}]${Gre}%${width}sOK${RCol}\n" ' '
@@ -77,7 +79,7 @@ ok_message(){
 
 ko_message(){
     file="$1"
-    width=$((66 - `echo ${file}|wc -c`))
+    width=$(($TERM_WIDTH - 28 - `echo ${file}|wc -c`))
     if ! [ "${SILENT}" = "yes" ]
     then
         printf "${Red}Syntax check failed for ${Blu}[${BPur}${file}${Blu}]${Red}%${width}sKO${RCol}\n" ' '
