@@ -53,6 +53,17 @@ This script needs puppet to be installed.
 
 ## Installation ##
 
+
+### Proper way ###
+
+Clone this repository or download a release and:
+
+```bash
+make install
+```
+
+### Quick and dirty way ###
+
 As root:
 
 ```bash
