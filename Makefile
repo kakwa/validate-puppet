@@ -1,7 +1,7 @@
 PREFIX=/usr/local/
 EXEC_PREFIX=/usr/
 BINDIR=$(EXEC_PREFIX)/bin
-VERSION=0.0.1
+VERSION=0.0.2
 SYSCONFDIR=/etc/
 
 install:
