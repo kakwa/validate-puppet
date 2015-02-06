@@ -1,6 +1,7 @@
 # validate-puppet
 
 [![Join the chat at https://gitter.im/kakwa/validate-puppet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/kakwa/validate-puppet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Small shell script to validate puppet and erb source code
 
 ## Screenshot ##
